@@ -7,11 +7,16 @@ fi
 
 scripts/bnf2graph.sh json.1
 scripts/bnf2graph.sh json.2
+scripts/bnf2graph.sh json.3
+# Process killed!
+#scripts/bnf2graph.sh metag
 scripts/bnf2graph.sh stringparser
 scripts/bnf2graph.sh termcap.info
 
 perl -Ilib scripts/generate.demo.pl
 
+rm $DR/Perl-modules/html/marpax.grammar.graphviz2/*
 cp html/* $DR/Perl-modules/html/marpax.grammar.graphviz2/
 
-echo Also, copy demo files to the real web site...
+rm ~/savage.net.au/Perl-modules/html/marpax.grammar.graphviz2/*
+cp html/* ~/savage.net.au/Perl-modules/html/marpax.grammar.graphviz2/

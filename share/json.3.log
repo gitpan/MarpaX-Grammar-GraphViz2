@@ -5,15 +5,16 @@ Default global: label => ->
 Default global: name => Perl
 Default global: record_shape => Mrecord
 Default global: strict => 0
-Default global: subgraph => HASH(0x296f238)
+Default global: subgraph => HASH(0x3396530)
 Default global: timeout => 10
-Default graph: label => json.2.bnf, rankdir => TB
+Default graph: label => json.3.bnf, rankdir => TB
 Default node: shape => rectangle, style => filled
 Default edge: color => grey
-Added node: "json" [ fillcolor="lightgreen" label="{:start|json}" shape="Mrecord" ]
+Added node: "" [ fillcolor="lightgreen" label="{:start|}" shape="Mrecord" ]
 Added node: "꞉default" [ fillcolor="lightblue" label="꞉default" ]
+Added node: "json"
 Added edge: "json" -> "꞉default"
-Added node: "꞉default_1" [ fillcolor="goldenrod" label="{action =\> ꞉꞉array}" shape="Mrecord" ]
+Added node: "꞉default_1" [ fillcolor="goldenrod" label="{action =\> ꞉꞉first}" shape="Mrecord" ]
 Added edge: "꞉default" -> "꞉default_1"
 Added node: "꞉discard" [ fillcolor="lightblue" label="꞉discard" ]
 Added edge: "json" -> "꞉discard"
@@ -21,29 +22,25 @@ Added node: "whitespace" [ fillcolor="lightblue" label="whitespace" ]
 Added edge: "꞉discard" -> "whitespace"
 Added node: "lexeme default" [ fillcolor="lightblue" label="lexeme default" ]
 Added edge: "json" -> "lexeme default"
-Added node: "lexeme default_1" [ fillcolor="lightblue" label="{latm =\> 1}" shape="Mrecord" ]
+Added node: "lexeme default_1" [ fillcolor="lightblue" label="{action =\> \[name,value\]|latm =\> 1}" shape="Mrecord" ]
 Added edge: "lexeme default" -> "lexeme default_1"
-Added node: "object" [ fillcolor="white" label="object" ]
-Added edge: "json" -> "object"
-Added node: "object_attributes" [ fillcolor="goldenrod" label="{action =\> ꞉꞉first}" shape="Mrecord" ]
-Added edge: "object" -> "object_attributes"
+Added node: "hash" [ fillcolor="white" label="hash" ]
+Added edge: "json" -> "hash"
 Added node: "array" [ fillcolor="white" label="array" ]
 Added edge: "json" -> "array"
-Added node: "array_attributes" [ fillcolor="goldenrod" label="{action =\> ꞉꞉first}" shape="Mrecord" ]
-Added edge: "array" -> "array_attributes"
-Added node: "('{') members ('}')" [ fillcolor="white" label="('{') members ('}')" ]
-Added edge: "object" -> "('{') members ('}')"
+Added node: "('{') \<hash pairs\> ('}')" [ fillcolor="white" label="('{') \<hash pairs\> ('}')" ]
+Added edge: "hash" -> "('{') \<hash pairs\> ('}')"
 Added node: "('{')" [ fillcolor="white" label="('{')" ]
-Added edge: "('{') members ('}')" -> "('{')"
-Added node: "members" [ fillcolor="white" label="members" ]
-Added edge: "('{') members ('}')" -> "members"
+Added edge: "('{') \<hash pairs\> ('}')" -> "('{')"
+Added node: "\<hash pairs\>" [ fillcolor="white" label="\<hash pairs\>" ]
+Added edge: "('{') \<hash pairs\> ('}')" -> "\<hash pairs\>"
 Added node: "('}')" [ fillcolor="white" label="('}')" ]
-Added edge: "('{') members ('}')" -> "('}')"
-Added node: "('{') members ('}')_attributes" [ fillcolor="goldenrod" label="{bless =\> hash}" shape="Mrecord" ]
-Added edge: "('{') members ('}')" -> "('{') members ('}')_attributes"
+Added edge: "('{') \<hash pairs\> ('}')" -> "('}')"
+Added node: "('{') \<hash pairs\> ('}')_attributes" [ fillcolor="goldenrod" label="{action =\> \[name,value\]}" shape="Mrecord" ]
+Added edge: "('{') \<hash pairs\> ('}')" -> "('{') \<hash pairs\> ('}')_attributes"
 Added node: "pair" [ fillcolor="white" label="pair*" ]
-Added edge: "members" -> "pair"
-Added node: "pair_attributes" [ fillcolor="goldenrod" label="{separator =\> \<comma\>}" shape="Mrecord" ]
+Added edge: "\<hash pairs\>" -> "pair"
+Added node: "pair_attributes" [ fillcolor="goldenrod" label="{action =\> \[values\]|separator =\> \<comma\>}" shape="Mrecord" ]
 Added edge: "pair" -> "pair_attributes"
 Added node: "string ('꞉') value" [ fillcolor="white" label="string ('꞉') value" ]
 Added edge: "pair" -> "string ('꞉') value"
@@ -53,35 +50,31 @@ Added node: "('꞉')" [ fillcolor="white" label="('꞉')" ]
 Added edge: "string ('꞉') value" -> "('꞉')"
 Added node: "value" [ fillcolor="white" label="value" ]
 Added edge: "string ('꞉') value" -> "value"
+Added node: "string ('꞉') value_attributes" [ fillcolor="goldenrod" label="{action =\> \[values\]}" shape="Mrecord" ]
+Added edge: "string ('꞉') value" -> "string ('꞉') value_attributes"
 Added edge: "value" -> "string"
-Added node: "string_attributes" [ fillcolor="goldenrod" label="{action =\> ꞉꞉first}" shape="Mrecord" ]
-Added edge: "string" -> "string_attributes"
-Added edge: "value" -> "object"
-Added edge: "object" -> "object_attributes"
+Added edge: "value" -> "hash"
 Added node: "number" [ fillcolor="white" label="number" ]
 Added edge: "value" -> "number"
-Added node: "number_attributes" [ fillcolor="goldenrod" label="{action =\> ꞉꞉first}" shape="Mrecord" ]
-Added edge: "number" -> "number_attributes"
 Added edge: "value" -> "array"
-Added edge: "array" -> "array_attributes"
+Added node: "true" [ fillcolor="white" label="true" ]
+Added edge: "value" -> "true"
+Added node: "false" [ fillcolor="white" label="false" ]
+Added edge: "value" -> "false"
+Added node: "null" [ fillcolor="white" label="null" ]
+Added edge: "value" -> "null"
 Added node: "'true'" [ fillcolor="white" label="'true'" ]
-Added edge: "value" -> "'true'"
-Added node: "'true'_attributes" [ fillcolor="goldenrod" label="{bless =\> true}" shape="Mrecord" ]
+Added edge: "true" -> "'true'"
+Added node: "'true'_attributes" [ fillcolor="goldenrod" label="{action =\> \[name\]}" shape="Mrecord" ]
 Added edge: "'true'" -> "'true'_attributes"
 Added node: "'false'" [ fillcolor="white" label="'false'" ]
-Added edge: "value" -> "'false'"
-Added node: "'false'_attributes" [ fillcolor="goldenrod" label="{bless =\> false}" shape="Mrecord" ]
+Added edge: "false" -> "'false'"
+Added node: "'false'_attributes" [ fillcolor="goldenrod" label="{action =\> \[name\]}" shape="Mrecord" ]
 Added edge: "'false'" -> "'false'_attributes"
 Added node: "'null'" [ fillcolor="white" label="'null'" ]
-Added edge: "value" -> "'null'"
-Added node: "'null'_attributes" [ fillcolor="goldenrod" label="{action =\> ꞉꞉undef}" shape="Mrecord" ]
+Added edge: "null" -> "'null'"
+Added node: "'null'_attributes" [ fillcolor="goldenrod" label="{action =\> \[name\]}" shape="Mrecord" ]
 Added edge: "'null'" -> "'null'_attributes"
-Added node: "('[' ']')" [ fillcolor="white" label="('\[' '\]')" ]
-Added edge: "array" -> "('[' ']')"
-Added node: "('['" [ fillcolor="white" label="('\['" ]
-Added edge: "('[' ']')" -> "('['"
-Added node: "']')" [ fillcolor="white" label="'\]')" ]
-Added edge: "('[' ']')" -> "']')"
 Added node: "('[') elements (']')" [ fillcolor="white" label="('\[') elements ('\]')" ]
 Added edge: "array" -> "('[') elements (']')"
 Added node: "('[')" [ fillcolor="white" label="('\[')" ]
@@ -90,10 +83,10 @@ Added node: "elements" [ fillcolor="white" label="elements" ]
 Added edge: "('[') elements (']')" -> "elements"
 Added node: "(']')" [ fillcolor="white" label="('\]')" ]
 Added edge: "('[') elements (']')" -> "(']')"
-Added node: "('[') elements (']')_attributes" [ fillcolor="goldenrod" label="{action =\> ꞉꞉first}" shape="Mrecord" ]
+Added node: "('[') elements (']')_attributes" [ fillcolor="goldenrod" label="{action =\> \[name,values\]}" shape="Mrecord" ]
 Added edge: "('[') elements (']')" -> "('[') elements (']')_attributes"
 Added edge: "elements" -> "value"
-Added node: "value_attributes" [ fillcolor="goldenrod" label="{separator =\> \<comma\>}" shape="Mrecord" ]
+Added node: "value_attributes" [ fillcolor="goldenrod" label="{separator =\> \<comma\>|action =\> \[values\]}" shape="Mrecord" ]
 Added edge: "value" -> "value_attributes"
 Added node: "int" [ fillcolor="white" label="int" ]
 Added edge: "number" -> "int"
@@ -143,29 +136,49 @@ Added node: "'E+'" [ fillcolor="white" label="'E+'" ]
 Added edge: "e" -> "'E+'"
 Added node: "'E-'" [ fillcolor="white" label="'E-'" ]
 Added edge: "e" -> "'E-'"
-Added node: "\<string lexeme\>" [ fillcolor="white" label="\<string lexeme\>" ]
-Added edge: "string" -> "\<string lexeme\>"
-Added node: "\<string lexeme\>_attributes" [ fillcolor="goldenrod" label="{bless =\> string}" shape="Mrecord" ]
-Added edge: "\<string lexeme\>" -> "\<string lexeme\>_attributes"
-Added node: "quote \<string contents\> quote" [ fillcolor="white" label="quote \<string contents\> quote" ]
-Added edge: "\<string lexeme\>" -> "quote \<string contents\> quote"
-Added node: "quote" [ fillcolor="white" label="quote" ]
-Added edge: "quote \<string contents\> quote" -> "quote"
+Added node: "(quote) \<string contents\> (quote)" [ fillcolor="white" label="(quote) \<string contents\> (quote)" ]
+Added edge: "string" -> "(quote) \<string contents\> (quote)"
+Added node: "(quote)" [ fillcolor="white" label="(quote)" ]
+Added edge: "(quote) \<string contents\> (quote)" -> "(quote)"
 Added node: "\<string contents\>" [ fillcolor="white" label="\<string contents\>" ]
-Added edge: "quote \<string contents\> quote" -> "\<string contents\>"
-Added edge: "quote \<string contents\> quote" -> "quote"
-Added node: "[ꞌꞌ]" [ fillcolor="white" label="\[ꞌꞌ\]" ]
-Added edge: "quote" -> "[ꞌꞌ]"
-Added node: "\<string char\>" [ fillcolor="white" label="\<string char\>*" ]
-Added edge: "\<string contents\>" -> "\<string char\>"
-Added node: "[^ꞌꞌ\\\\]" [ fillcolor="white" label="\[^ꞌꞌ\\\\]" ]
-Added edge: "\<string char\>" -> "[^ꞌꞌ\\\\]"
-Added node: "'\\' \<any char\>" [ fillcolor="white" label="'\\' \<any char\>" ]
-Added edge: "\<string char\>" -> "'\\' \<any char\>"
-Added node: "'\\'" [ fillcolor="white" label="'\\'" ]
-Added edge: "'\\' \<any char\>" -> "'\\'"
+Added edge: "(quote) \<string contents\> (quote)" -> "\<string contents\>"
+Added edge: "(quote) \<string contents\> (quote)" -> "(quote)"
+Added node: "(quote) \<string contents\> (quote)_attributes" [ fillcolor="goldenrod" label="{action =\> \[name,values\]}" shape="Mrecord" ]
+Added edge: "(quote) \<string contents\> (quote)" -> "(quote) \<string contents\> (quote)_attributes"
+Added node: "\<string piece\>" [ fillcolor="white" label="\<string piece\>*" ]
+Added edge: "\<string contents\>" -> "\<string piece\>"
+Added node: "\<string piece\>_attributes" [ fillcolor="goldenrod" label="{action =\> \[values\]}" shape="Mrecord" ]
+Added edge: "\<string piece\>" -> "\<string piece\>_attributes"
+Added node: "\<easy string\>" [ fillcolor="white" label="\<easy string\>" ]
+Added edge: "\<string piece\>" -> "\<easy string\>"
+Added node: "\<escaped char\>" [ fillcolor="white" label="\<escaped char\>" ]
+Added edge: "\<string piece\>" -> "\<escaped char\>"
+Added node: "\<hex char\>" [ fillcolor="white" label="\<hex char\>" ]
+Added edge: "\<string piece\>" -> "\<hex char\>"
+Added node: "('\\') \<any char\>" [ fillcolor="white" label="('\\') \<any char\>" ]
+Added edge: "\<escaped char\>" -> "('\\') \<any char\>"
+Added node: "('\\')" [ fillcolor="white" label="('\\')" ]
+Added edge: "('\\') \<any char\>" -> "('\\')"
 Added node: "\<any char\>" [ fillcolor="white" label="\<any char\>" ]
-Added edge: "'\\' \<any char\>" -> "\<any char\>"
+Added edge: "('\\') \<any char\>" -> "\<any char\>"
+Added node: "[ꞌꞌ]" [ fillcolor="white" label="\[ꞌꞌ\]" ]
+Added node: "quote"
+Added edge: "quote" -> "[ꞌꞌ]"
+Added node: "[^ꞌꞌ\\\\]" [ fillcolor="white" label="\[^ꞌꞌ\\\\]*" ]
+Added edge: "\<easy string\>" -> "[^ꞌꞌ\\\\]"
+Added node: "'\\' 'u' \<hex digit\> \<hex digit\> \<hex digit\> \<hex digit\>" [ fillcolor="white" label="'\\' 'u' \<hex digit\> \<hex digit\> \<hex digit\> \<hex digit\>" ]
+Added edge: "\<hex char\>" -> "'\\' 'u' \<hex digit\> \<hex digit\> \<hex digit\> \<hex digit\>"
+Added node: "'\\'" [ fillcolor="white" label="'\\'" ]
+Added edge: "'\\' 'u' \<hex digit\> \<hex digit\> \<hex digit\> \<hex digit\>" -> "'\\'"
+Added node: "'u'" [ fillcolor="white" label="'u'" ]
+Added edge: "'\\' 'u' \<hex digit\> \<hex digit\> \<hex digit\> \<hex digit\>" -> "'u'"
+Added node: "\<hex digit\>" [ fillcolor="white" label="\<hex digit\>" ]
+Added edge: "'\\' 'u' \<hex digit\> \<hex digit\> \<hex digit\> \<hex digit\>" -> "\<hex digit\>"
+Added edge: "'\\' 'u' \<hex digit\> \<hex digit\> \<hex digit\> \<hex digit\>" -> "\<hex digit\>"
+Added edge: "'\\' 'u' \<hex digit\> \<hex digit\> \<hex digit\> \<hex digit\>" -> "\<hex digit\>"
+Added edge: "'\\' 'u' \<hex digit\> \<hex digit\> \<hex digit\> \<hex digit\>" -> "\<hex digit\>"
+Added node: "[0-9A-Fa-f]" [ fillcolor="white" label="\[0-9A-Fa-f\]" ]
+Added edge: "\<hex digit\>" -> "[0-9A-Fa-f]"
 Added node: "[\\d\\D]" [ fillcolor="white" label="\[\\d\\D\]" ]
 Added edge: "\<any char\>" -> "[\\d\\D]"
 Added node: "','" [ fillcolor="white" label="','" ]
@@ -173,7 +186,7 @@ Added node: "comma"
 Added edge: "comma" -> "','"
 Added node: "[\\s]" [ fillcolor="white" label="\[\\s\]+" ]
 Added edge: "whitespace" -> "[\\s]"
-Default graph: label => json.2.bnf, rankdir => TB
+Default graph: label => json.3.bnf, rankdir => TB
 Default node: shape => rectangle, style => filled
 Default edge: color => grey
 Default subgraph: rank => max
@@ -194,17 +207,18 @@ Added node: "Legend" [ label=<<table bgcolor = 'white'>
 	<td bgcolor = 'firebrick1'>Red nodes are for events</td>
 </tr>
 </table>> shape="plaintext" ]
-Driver: /usr/local/bin/dot. Output file: html/json.2.svg. Format: svg. Timeout: 10 second(s)
+Driver: /usr/local/bin/dot. Output file: html/json.3.svg. Format: svg. Timeout: 10 second(s)
 
 digraph Perl
 {
-graph [ label="json.2.bnf" rankdir="TB" ]
+graph [ label="json.3.bnf" rankdir="TB" ]
 node [ shape="rectangle" style="filled" ]
 edge [ color="grey" ]
-"json" [ fillcolor="lightgreen" label="{:start|json}" shape="Mrecord" ]
+"" [ fillcolor="lightgreen" label="{:start|}" shape="Mrecord" ]
 "꞉default" [ fillcolor="lightblue" label="꞉default" ]
+"json"
 "json" -> "꞉default"
-"꞉default_1" [ fillcolor="goldenrod" label="{action =\> ꞉꞉array}" shape="Mrecord" ]
+"꞉default_1" [ fillcolor="goldenrod" label="{action =\> ꞉꞉first}" shape="Mrecord" ]
 "꞉default" -> "꞉default_1"
 "꞉discard" [ fillcolor="lightblue" label="꞉discard" ]
 "json" -> "꞉discard"
@@ -212,29 +226,25 @@ edge [ color="grey" ]
 "꞉discard" -> "whitespace"
 "lexeme default" [ fillcolor="lightblue" label="lexeme default" ]
 "json" -> "lexeme default"
-"lexeme default_1" [ fillcolor="lightblue" label="{latm =\> 1}" shape="Mrecord" ]
+"lexeme default_1" [ fillcolor="lightblue" label="{action =\> \[name,value\]|latm =\> 1}" shape="Mrecord" ]
 "lexeme default" -> "lexeme default_1"
-"object" [ fillcolor="white" label="object" ]
-"json" -> "object"
-"object_attributes" [ fillcolor="goldenrod" label="{action =\> ꞉꞉first}" shape="Mrecord" ]
-"object" -> "object_attributes"
+"hash" [ fillcolor="white" label="hash" ]
+"json" -> "hash"
 "array" [ fillcolor="white" label="array" ]
 "json" -> "array"
-"array_attributes" [ fillcolor="goldenrod" label="{action =\> ꞉꞉first}" shape="Mrecord" ]
-"array" -> "array_attributes"
-"('{') members ('}')" [ fillcolor="white" label="('{') members ('}')" ]
-"object" -> "('{') members ('}')"
+"('{') \<hash pairs\> ('}')" [ fillcolor="white" label="('{') \<hash pairs\> ('}')" ]
+"hash" -> "('{') \<hash pairs\> ('}')"
 "('{')" [ fillcolor="white" label="('{')" ]
-"('{') members ('}')" -> "('{')"
-"members" [ fillcolor="white" label="members" ]
-"('{') members ('}')" -> "members"
+"('{') \<hash pairs\> ('}')" -> "('{')"
+"\<hash pairs\>" [ fillcolor="white" label="\<hash pairs\>" ]
+"('{') \<hash pairs\> ('}')" -> "\<hash pairs\>"
 "('}')" [ fillcolor="white" label="('}')" ]
-"('{') members ('}')" -> "('}')"
-"('{') members ('}')_attributes" [ fillcolor="goldenrod" label="{bless =\> hash}" shape="Mrecord" ]
-"('{') members ('}')" -> "('{') members ('}')_attributes"
+"('{') \<hash pairs\> ('}')" -> "('}')"
+"('{') \<hash pairs\> ('}')_attributes" [ fillcolor="goldenrod" label="{action =\> \[name,value\]}" shape="Mrecord" ]
+"('{') \<hash pairs\> ('}')" -> "('{') \<hash pairs\> ('}')_attributes"
 "pair" [ fillcolor="white" label="pair*" ]
-"members" -> "pair"
-"pair_attributes" [ fillcolor="goldenrod" label="{separator =\> \<comma\>}" shape="Mrecord" ]
+"\<hash pairs\>" -> "pair"
+"pair_attributes" [ fillcolor="goldenrod" label="{action =\> \[values\]|separator =\> \<comma\>}" shape="Mrecord" ]
 "pair" -> "pair_attributes"
 "string ('꞉') value" [ fillcolor="white" label="string ('꞉') value" ]
 "pair" -> "string ('꞉') value"
@@ -244,35 +254,31 @@ edge [ color="grey" ]
 "string ('꞉') value" -> "('꞉')"
 "value" [ fillcolor="white" label="value" ]
 "string ('꞉') value" -> "value"
+"string ('꞉') value_attributes" [ fillcolor="goldenrod" label="{action =\> \[values\]}" shape="Mrecord" ]
+"string ('꞉') value" -> "string ('꞉') value_attributes"
 "value" -> "string"
-"string_attributes" [ fillcolor="goldenrod" label="{action =\> ꞉꞉first}" shape="Mrecord" ]
-"string" -> "string_attributes"
-"value" -> "object"
-"object" -> "object_attributes"
+"value" -> "hash"
 "number" [ fillcolor="white" label="number" ]
 "value" -> "number"
-"number_attributes" [ fillcolor="goldenrod" label="{action =\> ꞉꞉first}" shape="Mrecord" ]
-"number" -> "number_attributes"
 "value" -> "array"
-"array" -> "array_attributes"
+"true" [ fillcolor="white" label="true" ]
+"value" -> "true"
+"false" [ fillcolor="white" label="false" ]
+"value" -> "false"
+"null" [ fillcolor="white" label="null" ]
+"value" -> "null"
 "'true'" [ fillcolor="white" label="'true'" ]
-"value" -> "'true'"
-"'true'_attributes" [ fillcolor="goldenrod" label="{bless =\> true}" shape="Mrecord" ]
+"true" -> "'true'"
+"'true'_attributes" [ fillcolor="goldenrod" label="{action =\> \[name\]}" shape="Mrecord" ]
 "'true'" -> "'true'_attributes"
 "'false'" [ fillcolor="white" label="'false'" ]
-"value" -> "'false'"
-"'false'_attributes" [ fillcolor="goldenrod" label="{bless =\> false}" shape="Mrecord" ]
+"false" -> "'false'"
+"'false'_attributes" [ fillcolor="goldenrod" label="{action =\> \[name\]}" shape="Mrecord" ]
 "'false'" -> "'false'_attributes"
 "'null'" [ fillcolor="white" label="'null'" ]
-"value" -> "'null'"
-"'null'_attributes" [ fillcolor="goldenrod" label="{action =\> ꞉꞉undef}" shape="Mrecord" ]
+"null" -> "'null'"
+"'null'_attributes" [ fillcolor="goldenrod" label="{action =\> \[name\]}" shape="Mrecord" ]
 "'null'" -> "'null'_attributes"
-"('[' ']')" [ fillcolor="white" label="('\[' '\]')" ]
-"array" -> "('[' ']')"
-"('['" [ fillcolor="white" label="('\['" ]
-"('[' ']')" -> "('['"
-"']')" [ fillcolor="white" label="'\]')" ]
-"('[' ']')" -> "']')"
 "('[') elements (']')" [ fillcolor="white" label="('\[') elements ('\]')" ]
 "array" -> "('[') elements (']')"
 "('[')" [ fillcolor="white" label="('\[')" ]
@@ -281,10 +287,10 @@ edge [ color="grey" ]
 "('[') elements (']')" -> "elements"
 "(']')" [ fillcolor="white" label="('\]')" ]
 "('[') elements (']')" -> "(']')"
-"('[') elements (']')_attributes" [ fillcolor="goldenrod" label="{action =\> ꞉꞉first}" shape="Mrecord" ]
+"('[') elements (']')_attributes" [ fillcolor="goldenrod" label="{action =\> \[name,values\]}" shape="Mrecord" ]
 "('[') elements (']')" -> "('[') elements (']')_attributes"
 "elements" -> "value"
-"value_attributes" [ fillcolor="goldenrod" label="{separator =\> \<comma\>}" shape="Mrecord" ]
+"value_attributes" [ fillcolor="goldenrod" label="{separator =\> \<comma\>|action =\> \[values\]}" shape="Mrecord" ]
 "value" -> "value_attributes"
 "int" [ fillcolor="white" label="int" ]
 "number" -> "int"
@@ -334,29 +340,49 @@ edge [ color="grey" ]
 "e" -> "'E+'"
 "'E-'" [ fillcolor="white" label="'E-'" ]
 "e" -> "'E-'"
-"\<string lexeme\>" [ fillcolor="white" label="\<string lexeme\>" ]
-"string" -> "\<string lexeme\>"
-"\<string lexeme\>_attributes" [ fillcolor="goldenrod" label="{bless =\> string}" shape="Mrecord" ]
-"\<string lexeme\>" -> "\<string lexeme\>_attributes"
-"quote \<string contents\> quote" [ fillcolor="white" label="quote \<string contents\> quote" ]
-"\<string lexeme\>" -> "quote \<string contents\> quote"
-"quote" [ fillcolor="white" label="quote" ]
-"quote \<string contents\> quote" -> "quote"
+"(quote) \<string contents\> (quote)" [ fillcolor="white" label="(quote) \<string contents\> (quote)" ]
+"string" -> "(quote) \<string contents\> (quote)"
+"(quote)" [ fillcolor="white" label="(quote)" ]
+"(quote) \<string contents\> (quote)" -> "(quote)"
 "\<string contents\>" [ fillcolor="white" label="\<string contents\>" ]
-"quote \<string contents\> quote" -> "\<string contents\>"
-"quote \<string contents\> quote" -> "quote"
-"[ꞌꞌ]" [ fillcolor="white" label="\[ꞌꞌ\]" ]
-"quote" -> "[ꞌꞌ]"
-"\<string char\>" [ fillcolor="white" label="\<string char\>*" ]
-"\<string contents\>" -> "\<string char\>"
-"[^ꞌꞌ\\\\]" [ fillcolor="white" label="\[^ꞌꞌ\\\\]" ]
-"\<string char\>" -> "[^ꞌꞌ\\\\]"
-"'\\' \<any char\>" [ fillcolor="white" label="'\\' \<any char\>" ]
-"\<string char\>" -> "'\\' \<any char\>"
-"'\\'" [ fillcolor="white" label="'\\'" ]
-"'\\' \<any char\>" -> "'\\'"
+"(quote) \<string contents\> (quote)" -> "\<string contents\>"
+"(quote) \<string contents\> (quote)" -> "(quote)"
+"(quote) \<string contents\> (quote)_attributes" [ fillcolor="goldenrod" label="{action =\> \[name,values\]}" shape="Mrecord" ]
+"(quote) \<string contents\> (quote)" -> "(quote) \<string contents\> (quote)_attributes"
+"\<string piece\>" [ fillcolor="white" label="\<string piece\>*" ]
+"\<string contents\>" -> "\<string piece\>"
+"\<string piece\>_attributes" [ fillcolor="goldenrod" label="{action =\> \[values\]}" shape="Mrecord" ]
+"\<string piece\>" -> "\<string piece\>_attributes"
+"\<easy string\>" [ fillcolor="white" label="\<easy string\>" ]
+"\<string piece\>" -> "\<easy string\>"
+"\<escaped char\>" [ fillcolor="white" label="\<escaped char\>" ]
+"\<string piece\>" -> "\<escaped char\>"
+"\<hex char\>" [ fillcolor="white" label="\<hex char\>" ]
+"\<string piece\>" -> "\<hex char\>"
+"('\\') \<any char\>" [ fillcolor="white" label="('\\') \<any char\>" ]
+"\<escaped char\>" -> "('\\') \<any char\>"
+"('\\')" [ fillcolor="white" label="('\\')" ]
+"('\\') \<any char\>" -> "('\\')"
 "\<any char\>" [ fillcolor="white" label="\<any char\>" ]
-"'\\' \<any char\>" -> "\<any char\>"
+"('\\') \<any char\>" -> "\<any char\>"
+"[ꞌꞌ]" [ fillcolor="white" label="\[ꞌꞌ\]" ]
+"quote"
+"quote" -> "[ꞌꞌ]"
+"[^ꞌꞌ\\\\]" [ fillcolor="white" label="\[^ꞌꞌ\\\\]*" ]
+"\<easy string\>" -> "[^ꞌꞌ\\\\]"
+"'\\' 'u' \<hex digit\> \<hex digit\> \<hex digit\> \<hex digit\>" [ fillcolor="white" label="'\\' 'u' \<hex digit\> \<hex digit\> \<hex digit\> \<hex digit\>" ]
+"\<hex char\>" -> "'\\' 'u' \<hex digit\> \<hex digit\> \<hex digit\> \<hex digit\>"
+"'\\'" [ fillcolor="white" label="'\\'" ]
+"'\\' 'u' \<hex digit\> \<hex digit\> \<hex digit\> \<hex digit\>" -> "'\\'"
+"'u'" [ fillcolor="white" label="'u'" ]
+"'\\' 'u' \<hex digit\> \<hex digit\> \<hex digit\> \<hex digit\>" -> "'u'"
+"\<hex digit\>" [ fillcolor="white" label="\<hex digit\>" ]
+"'\\' 'u' \<hex digit\> \<hex digit\> \<hex digit\> \<hex digit\>" -> "\<hex digit\>"
+"'\\' 'u' \<hex digit\> \<hex digit\> \<hex digit\> \<hex digit\>" -> "\<hex digit\>"
+"'\\' 'u' \<hex digit\> \<hex digit\> \<hex digit\> \<hex digit\>" -> "\<hex digit\>"
+"'\\' 'u' \<hex digit\> \<hex digit\> \<hex digit\> \<hex digit\>" -> "\<hex digit\>"
+"[0-9A-Fa-f]" [ fillcolor="white" label="\[0-9A-Fa-f\]" ]
+"\<hex digit\>" -> "[0-9A-Fa-f]"
 "[\\d\\D]" [ fillcolor="white" label="\[\\d\\D\]" ]
 "\<any char\>" -> "[\\d\\D]"
 "','" [ fillcolor="white" label="','" ]
@@ -367,7 +393,7 @@ edge [ color="grey" ]
 
 subgraph 
 {
-graph [ label="json.2.bnf" rankdir="TB" ]
+graph [ label="json.3.bnf" rankdir="TB" ]
 node [ shape="rectangle" style="filled" ]
 edge [ color="grey" ]
 rank="max" 
@@ -390,4 +416,4 @@ rank="max"
 </table>> shape="plaintext" ]
 }
 }
-Wrote html/json.2.svg. Size: 59786 bytes
+Wrote html/json.3.svg. Size: 67574 bytes

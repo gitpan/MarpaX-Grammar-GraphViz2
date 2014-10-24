@@ -22,7 +22,6 @@ use HTML::Entities::Interpolate;
 use Moo;
 
 use Path::Tiny;   # For path().
-use Perl6::Slurp; # For slurp().
 
 use Text::Xslate 'mark_raw';
 
@@ -34,7 +33,7 @@ has config =>
 	required => 0,
 );
 
-our $VERSION = '1.00';
+our $VERSION = '1.05';
 
 # ------------------------------------------------
 
@@ -56,7 +55,7 @@ sub generate_demo_environment
 
 } # End of generate_demo_environment.
 
-# -----------------------------------------------
+# ------------------------------------------------
 
 sub generate_demo_index
 {
@@ -116,9 +115,9 @@ sub generate_demo_index
 	);
 	my($file_name) = File::Spec -> catfile($html_dir_name, 'index.html');
 
-	open(OUT, '>', $file_name);
-	print OUT $index;
-	close OUT;
+	open(my $fh, '>', $file_name);
+	print $fh $index;
+	close $fh;
 
 	print "Wrote $file_name\n";
 
@@ -128,7 +127,7 @@ sub generate_demo_index
 
 } # End of generate_demo_index.
 
-# -----------------------------------------------
+# ------------------------------------------------
 
 1;
 

@@ -14,13 +14,14 @@ all_from 'lib/MarpaX/Grammar/GraphViz2.pm';
 
 install_share;
 
+repository 'https://github.com/ronsavage/MarpaX-Grammar-GraphViz2';
+
 requires 'charnames'               => 1.18;
 requires 'Config'                  => undef;
 requires 'Config::Tiny'            => 2.15;
 requires 'Date::Simple'            => 3.03;
 requires 'Getopt::Long'            => 2.41;
 requires 'File::Basename'          => 2.82;
-requires 'File::Copy'              => 2.21;
 requires 'File::HomeDir'           => 1.00;
 requires 'File::ShareDir'          => 1.03;
 requires 'File::Slurp'             => 9999.19;
@@ -31,12 +32,11 @@ requires 'GraphViz2'               => 2.19;
 requires 'HTML::Entities::Interpolate' => 1.05;
 requires 'List::AllUtils'          => 0.03;
 requires 'Log::Handler'            => 0.78;
-requires 'MarpaX::Grammar::Parser' => 1.01;
+requires 'MarpaX::Grammar::Parser' => 1.07;
 requires 'Moo'                     => 1.002000;
 requires 'open'                    => 0;
 requires 'Path::Tiny'              => 0.025;
 requires 'perl'                    => '5.14.2'; # For the utf8 stuff.
-requires 'Perl6::Slurp'            => 0.03;
 requires 'Pod::Usage'              => 1.36;
 requires 'strict'                  => 0;
 requires 'Text::Xslate'            => 1.6002;

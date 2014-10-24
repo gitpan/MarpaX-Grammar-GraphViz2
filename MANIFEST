@@ -12,6 +12,7 @@ html/c.ast.svg
 html/index.html
 html/json.1.svg
 html/json.2.svg
+html/json.3.svg
 html/stringparser.svg
 html/termcap.info.svg
 inc/Module/Install.pm
@@ -28,6 +29,7 @@ lib/MarpaX/Grammar/GraphViz2.pm
 lib/MarpaX/Grammar/GraphViz2/Config.pm
 lib/MarpaX/Grammar/GraphViz2/Filer.pm
 lib/MarpaX/Grammar/GraphViz2/Utils.pm
+LICENSE
 Makefile.PL
 MANIFEST			This list of files
 META.json
@@ -45,6 +47,8 @@ share/json.1.bnf
 share/json.1.log
 share/json.2.bnf
 share/json.2.log
+share/json.3.bnf
+share/json.3.log
 share/metag.bnf
 share/stringparser.bnf
 share/stringparser.log

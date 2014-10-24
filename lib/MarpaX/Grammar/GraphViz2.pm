@@ -110,7 +110,7 @@ has marpa_bnf_file =>
 
 has maxlevel =>
 (
-	default  => sub{return 'info'},
+	default  => sub{return 'notice'},
 	is       => 'rw',
 #	isa      => 'Str',
 	required => 0,
@@ -126,7 +126,7 @@ has minlevel =>
 
 has nodes_seen =>
 (
-	default  => sub{return {}},
+	default  => sub{return {} },
 	is       => 'rw',
 	#isa     => 'HashRef',
 	required => 0,
@@ -172,9 +172,9 @@ has user_bnf_file =>
 	required => 1,
 );
 
-our $VERSION = '1.00';
+our $VERSION = '1.05';
 
-# --------------------------------------------------
+# ------------------------------------------------
 
 sub add_legend
 {
@@ -253,8 +253,8 @@ sub BUILD
 {
 	my($self)  = @_;
 
-	die "No Marpa SLIF-DSL file found\n" if (! -e $self -> marpa_bnf_file);
-	die "No user SLIF-DSL file found\n"  if (! -e $self -> user_bnf_file);
+	die "No Marpa BNF file found\n" if (! -e $self -> marpa_bnf_file);
+	die "No user BNF file found\n"  if (! -e $self -> user_bnf_file);
 
 	$self -> driver($self -> driver || which('dot') );
 	$self -> format($self -> format || 'svg');
@@ -296,7 +296,7 @@ sub BUILD
 
 } # End of BUILD.
 
-# --------------------------------------------------
+# ------------------------------------------------
 
 sub clean_name
 {
@@ -317,7 +317,7 @@ sub clean_name
 
 } # End of clean_name.
 
-# --------------------------------------------------
+# ------------------------------------------------
 
 sub clean_tree
 {
@@ -330,9 +330,14 @@ sub clean_tree
 	({
 		callback => sub
 		{
+			# Elsewhere, the code uses these attributes (so we init them if necessary):
+			# o name.
+			# o quantifier.
+			# o real_name.
+
 			my($node, $options) = @_;
 			$name               = $node -> name;
-			$attributes         = $node -> attributes;
+			$attributes         = {name => '', quantifier => '', real_name => '', %{$node -> attributes} };
 
 			$node -> attributes($attributes);
 			$node -> name($self -> clean_name($name) );
@@ -344,7 +349,18 @@ sub clean_tree
 
 } # End of clean_tree.
 
-# --------------------------------------------------
+# ------------------------------------------------
+
+sub hashref2string
+{
+	my($self, $hashref) = @_;
+	$hashref ||= {};
+
+	return '{' . join(', ', map{qq|$_ => "$$hashref{$_}"|} sort keys %$hashref) . '}';
+
+} # End of hashref2string.
+
+# ------------------------------------------------
 
 sub log
 {
@@ -354,7 +370,7 @@ sub log
 
 } # End of log.
 
-# --------------------------------------------------
+# ------------------------------------------------
 
 sub _process_adverbs
 {
@@ -372,7 +388,10 @@ sub _process_adverbs
 		if ($$daughters[$end - 1] -> name eq '=>')
 		{
 			$adverb = $$daughters[$end - 2] -> name;
-			@token  = $self -> rectify_name($$daughters[$end]);
+
+			# rectify_name() returns a ($name => $label) pair.
+
+			@token = $self -> rectify_name($$daughters[$end]);
 
 			pop @$daughters for 1 .. 3;
 
@@ -405,41 +424,42 @@ sub _process_adverbs
 
 } # End of _process_adverbs.
 
-# --------------------------------------------------
+# ------------------------------------------------
 # This handles prioritized rules and quantized rules.
 
 sub _process_complex_adverbs
 {
 	my($self, $index, $a_node) = @_;
-	my($finished)  = 0;
-	my($daughters) = [$a_node -> daughters];
 
 	# Sample inputs:
 	# o 1 token, no adverbs:
-	#   |---number
-	#   |   |---~
-	#   |   |---int
+	#   |--- number
+	#   |   |--- ~
+	#   |   |--- int
 	# o 2 tokens, no adverbs:
-	#   |---json
-	#   |   |---::=
-	#   |   |---object
-	#   |   |---|
-	#   |   |---array
+	#   |--- json
+	#   |   |--- ::=
+	#   |   |--- object
+	#   |   |--- |
+	#   |   |--- array
 	# o 5 tokens, various adverbs:
-	#   |---object
-	#   |   |---::=
-	#   |   |---'{'
-	#   |   |---'}'
-	#   |   |---action
-	#   |   |---=>
-	#   |   |---do_empty_object
-	#   |   |---|
-	#   |   |---'{'
-	#   |   |---members
-	#   |   |---'}'
-	#   |   |---action
-	#   |   |---=>
-	#   |   |---do_object
+	#   |--- object
+	#   |   |--- ::=
+	#   |   |--- '{'
+	#   |   |--- '}'
+	#   |   |--- action
+	#   |   |--- =>
+	#   |   |--- do_empty_object
+	#   |   |--- |
+	#   |   |--- '{'
+	#   |   |--- members
+	#   |   |--- '}'
+	#   |   |--- action
+	#   |   |--- =>
+	#   |   |--- do_object
+
+	my($daughters) = [$a_node -> daughters];
+	my($finished)  = $#$daughters >= 0 ? 0 : 1;
 
 	my($adverbs, @adverb_stack);
 	my(@daughter_stack);
@@ -471,9 +491,9 @@ sub _process_complex_adverbs
 
 		unshift @daughter_stack, [@token_stack];
 
-		# Discard the '|' separating alternatives in the SLIF-DSL.
+		# Discard the '|' separating alternatives in the BND.
 
-		pop @$daughters if ($$daughters[$i] -> name eq '|');
+		pop @$daughters if ( ($i >= 0) && ($$daughters[$i] -> name eq '|') );
 
 		$finished = 1 if ($#$daughters == 0);
 	}
@@ -482,7 +502,7 @@ sub _process_complex_adverbs
 
 } # End of _process_complex_adverbs.
 
-# --------------------------------------------------
+# ------------------------------------------------
 
 sub _process_default_rule
 {
@@ -518,7 +538,7 @@ sub _process_default_rule
 
 } # End of _process_default_rule.
 
-# --------------------------------------------------
+# ------------------------------------------------
 
 sub _process_discard_rule
 {
@@ -542,7 +562,10 @@ sub _process_discard_rule
 
 	# Ignore the first daughter, which is '=>'.
 
-	my(@daughters)      = $a_node -> daughters;
+	my(@daughters) = $a_node -> daughters;
+
+	# rectify_name() returns a ($name => $label) pair.
+
 	my(@name)           = $self -> rectify_name($daughters[1]);
 	$$attributes{label} = $name[1];
 
@@ -551,7 +574,7 @@ sub _process_discard_rule
 
 } # End of _process_discard_rule.
 
-# --------------------------------------------------
+# ------------------------------------------------
 
 sub _process_event_rule
 {
@@ -573,8 +596,11 @@ sub _process_event_rule
 		$self -> graph -> add_edge(from => $self -> root_node -> name, to => $event_name);
 	}
 
-	my($item_name)      = "${event_name}_$event_count";
-	my(@daughters)      = $a_node -> daughters;
+	my($item_name) = "${event_name}_$event_count";
+	my(@daughters) = $a_node -> daughters;
+
+	# rectify_name() returns a ($name => $label) pair.
+
 	my(@lhs)            = $self -> rectify_name($daughters[3]);
 	$$attributes{label} =
 	[
@@ -589,7 +615,7 @@ sub _process_event_rule
 
 } # End of _process_event_rule.
 
-# --------------------------------------------------
+# ------------------------------------------------
 
 sub _process_lexeme_default_rule
 {
@@ -617,21 +643,24 @@ sub _process_lexeme_default_rule
 
 } # End of _process_lexeme_default_rule.
 
-# --------------------------------------------------
+# ------------------------------------------------
 
 sub _process_lexeme_rule
 {
 	my($self, $index, $a_node) = @_;
-	my($daughters, $adverbs) = $self -> _process_adverbs([$a_node -> daughters]);
-	my(@name)                = $self -> rectify_name($$daughters[1]);
-	my($lexeme)              = $self -> lexemes;
-	$$lexeme{$name[0]}       = $#$adverbs >= 0 ? $adverbs : '';
+	my($daughters, $adverbs)   = $self -> _process_adverbs([$a_node -> daughters]);
+
+	# rectify_name() returns a ($name => $label) pair.
+
+	my(@name)          = $self -> rectify_name($$daughters[1]);
+	my($lexeme)        = $self -> lexemes;
+	$$lexeme{$name[0]} = $#$adverbs >= 0 ? $adverbs : '';
 
 	$self -> lexemes($lexeme);
 
 } # End of _process_lexeme_rule.
 
-# --------------------------------------------------
+# ------------------------------------------------
 
 sub _process_lexeme_token
 {
@@ -660,7 +689,7 @@ sub _process_lexeme_token
 
 } # End of _process_lexeme_token.
 
-# --------------------------------------------------
+# ------------------------------------------------
 
 sub _process_normal_rule
 {
@@ -669,18 +698,21 @@ sub _process_normal_rule
 
 	for my $i (0 .. $#$daughters)
 	{
-		$self -> _process_normal_tokens($index, $a_node, $lexemes, $$daughters[$i], $$adverbs[$i]);
+		if ($#{$$daughters[$i]} >= 0)
+		{
+			$self -> _process_normal_tokens($index, $a_node, $lexemes, $$daughters[$i], $$adverbs[$i]);
+		}
 	}
 
 } # End of _process_normal_rule.
 
-# --------------------------------------------------
+# ------------------------------------------------
 
 sub _process_normal_tokens
 {
 	my($self, $index, $a_node, $lexemes, $daughters, $adverbs) = @_;
 
-	# rectify_name() returns a set of ($name => $label) pairs.
+	# rectify_name() returns a ($name => $label) pair.
 
 	my(@name_map)   = map{$self -> rectify_name($_)} @$daughters;
 	my(@name)       = map{$name_map[$_]} indexes{$_ % 2 == 0} 0 .. $#name_map;
@@ -736,7 +768,7 @@ sub _process_normal_tokens
 
 } # End of _process_normal_tokens.
 
-# --------------------------------------------------
+# ------------------------------------------------
 
 sub _process_start_rule
 {
@@ -756,7 +788,7 @@ sub _process_start_rule
 
 } # End of _process_start_rule.
 
-# --------------------------------------------------
+# ------------------------------------------------
 
 sub rectify_name
 {
@@ -769,7 +801,7 @@ sub rectify_name
 
 } # End of rectify_name.
 
-# ------------------------------------------------
+# ----------------------------------------------
 
 sub run
 {
@@ -838,7 +870,10 @@ sub run
 
 	my($output_file) = $self -> output_file;
 
-	$self -> graph -> run(output_file => $output_file);
+	if ($output_file)
+	{
+		$self -> graph -> run(output_file => $output_file);
+	}
 
 	# Return 0 for success and 1 for failure.
 
@@ -879,16 +914,18 @@ For more help, run:
 
 	shell> perl -Ilib scripts/bnf2graph.pl -h
 
-Note: Installation includes copying all files from the share/ directory, into a dir chosen by L<File::ShareDir>.
-Run scripts/find.grammars.pl to display the name of the latter dir.
+Note: Installation includes copying all files from the share/ directory, into a dir chosen by
+L<File::ShareDir>. Run scripts/find.grammars.pl to display the name of the latter dir.
 
-See also L<the demo page|http://savage.net.au/Perl-modules/html/marpax.grammar.graphviz2/index.html>.
+See also
+L<the demo page|http://savage.net.au/Perl-modules/html/marpax.grammar.graphviz2/index.html>.
 
 =head1 Description
 
-Process the output cooked tree from L<MarpaX::Grammar::Parser>, and turn it into an image.
+For a given BNF, process the cooked tree output by L<MarpaX::Grammar::Parser>, and turn it into an
+image.
 
-The tree holds a representation of the user's SLIF-DSL, and is managed by L<Tree::DAG_Node>.
+The tree holds a representation of the user's BNF (SLIF-DSL), and is managed by L<Tree::DAG_Node>.
 
 This modules uses L<MarpaX::Grammar::Parser> internally. It does not read that module's output file.
 
@@ -918,12 +955,12 @@ or:
 	make test
 	make install
 
-Note: Installation includes copying all files from the share/ directory, into a dir chosen by L<File::ShareDir>.
-Run scripts/find.grammars.pl to display the name of the latter dir.
+Note: Installation includes copying all files from the share/ directory, into a dir chosen by
+L<File::ShareDir>. Run scripts/find.grammars.pl to display the name of the latter dir.
 
 =head1 Constructor and Initialization
 
-C<new()> is called as C<< my($parser) = MarpaX::Grammar::GraphViz2 -> new(k1 => v1, k2 => v2, ...) >>.
+Call C<new()> as C<< my($parser) = MarpaX::Grammar::GraphViz2 -> new(k1 => v1, k2 => v2, ...) >>.
 
 It returns a new object of type C<MarpaX::Grammar::GraphViz2>.
 
@@ -969,7 +1006,8 @@ Default: 0.
 
 Specify a logger object.
 
-The default value triggers creation of an object of type L<Log::Handler> which outputs to the screen.
+The default value triggers creation of an object of type L<Log::Handler> which outputs to the
+screen.
 
 To disable logging, just set I<logger> to the empty string.
 
@@ -977,11 +1015,12 @@ The value for I<logger> is passed to L<GraphViz2>.
 
 Default: undef.
 
-=item o marpa_bnf_file aMarpaSLIF-DSLFileName
+=item o marpa_bnf_file aMarpaBNFFileName
 
-Specify the name of Marpa's own SLIF-DSL file. This file ships with L<Marpa::R2>. It's name is metag.bnf.
+Specify the name of Marpa's own BNF file. This file ships with L<Marpa::R2>. It's name is
+metag.bnf.
 
-A copy, as of Marpa::R2 V 2.068000, ships with C<MarpaX::Grammar::GraphViz2>. See share/metag.bnf.
+A copy, as of Marpa::R2 V 2.096000, ships with C<MarpaX::Grammar::GraphViz2>. See share/metag.bnf.
 
 This option is mandatory.
 
@@ -993,7 +1032,7 @@ This option is only used if an object of type L<Log::Handler> is created. See I<
 
 See also L<Log::Handler::Levels>.
 
-Default: 'info'. A typical value is 'debug'.
+Default: 'notice'. A typical value is 'debug'.
 
 =item o minlevel => $level
 
@@ -1015,7 +1054,7 @@ If '', the file is not written.
 
 Default: ''.
 
-=item o user_bnf_file aUserSLIF-DSLFileName
+=item o user_bnf_file aUserBNFFileName
 
 Specify the name of the file containing your Marpa::R2-style grammar.
 
@@ -1107,8 +1146,9 @@ Returns the number of C<:lexeme> rules in the user's input.
 
 Returns a hashref keyed by the clean name, of lexemes seen in the user's input.
 
-The value for each key is an arrayref of hashrefs suitable for forcing L<GraphViz2> to plot the node as
-a record structure. See L<http://www.graphviz.org/content/node-shapes#record> for the gory details.
+The value for each key is an arrayref of hashrefs suitable for forcing L<GraphViz2> to plot the node
+as a record structure. See L<http://www.graphviz.org/content/node-shapes#record> for the gory
+details.
 
 =head2 log($level, $s)
 
@@ -1140,7 +1180,8 @@ Here, the [] indicate an optional parameter.
 
 Get or set the value used by the logger object.
 
-This option is only used if an object of type L<Log::Handler> is created. See L<Log::Handler::Levels>.
+This option is only used if an object of type L<Log::Handler> is created. See
+L<Log::Handler::Levels>.
 
 Note: C<maxlevel> is a parameter to new().
 
@@ -1150,7 +1191,8 @@ Here, the [] indicate an optional parameter.
 
 Get or set the value used by the logger object.
 
-This option is only used if an object of type L<Log::Handler> is created. See L<Log::Handler::Levels>.
+This option is only used if an object of type L<Log::Handler> is created. See
+L<Log::Handler::Levels>.
 
 Note: C<minlevel> is a parameter to new().
 
@@ -1186,12 +1228,12 @@ This object is created automatically during the call to L</new()>.
 
 For the given $node, which is an object of type L<Tree::DAG_Node>, clean it's real name.
 
-Then it adds the node's quantifier ('', '*' or '+') to that name, to act as the label (visible name) of the
-node, when the node is finally passed to L<GraphViz2>.
+Then it adds the node's quantifier ('', '*' or '+') to that name, to act as the label (visible name)
+of the node, when the node is finally passed to L<GraphViz2>.
 
 Returns a 2-element list of ($name, $label).
 
-=head2 root_name()
+=head2 root_node()
 
 Returns an object of type L<Tree::DAG_Node>, representing the C<:start> token in the user's grammar.
 
@@ -1203,9 +1245,18 @@ See L</Synopsis> and scripts/bnf2graph.pl for sample code.
 
 =head2 separators()
 
-Returns a hashref keyed by token name, of tokens used in the grammar construct C<< separator => $token >>.
+Returns a hashref keyed by token name, of tokens used in the grammar construc
+ C<< separator => $token >>.
 
 This hashref is currently not used.
+
+=head2 user_bnf_file([$bnf_file_name])
+
+Here, the [] indicate an optional parameter.
+
+Get or set the name of the file to read the user's grammar from.
+
+Note: C<user_bnf_file> is a parameter to new().
 
 =head1 Files Shipped with this Module
 
@@ -1235,10 +1286,6 @@ It is part of L<MarpaX::Demo::JSONParser>, written as a gist by Peter Stuifzand.
 
 See L<https://gist.github.com/pstuifzand/4447349>.
 
-=item o html/json.1.svg
-
-This is the image from json.1.bnf.
-
 See the next point for how this file is created.
 
 =item o share/json.1.log
@@ -1247,15 +1294,14 @@ This is the log produced by running the code at log level C<debug>:
 
 	shell> scripts/bnf2graph.sh json.1 -max debug > share/json.1.log
 
+=item o html/json.1.svg
+
+This is the image from json.1.bnf.
+
 =item o share/json.2.bnf
 
-It also is part of L<MarpaX::Demo::JSONParser>, written by Jeffrey Kegler as a reply to the gist above from Peter.
-
-=item o html/json.2.svg
-
-This is the image from json.2.bnf.
-
-See the next point for how this file is created.
+It also is part of L<MarpaX::Demo::JSONParser>, written by Jeffrey Kegler as a reply to the gist
+above from Peter.
 
 =item o share/json.2.log
 
@@ -1263,15 +1309,35 @@ This is the log produced by running the code at log level C<debug>:
 
 	shell> scripts/bnf2graph.sh json.2 -max debug > share/json.2.log
 
+=item o html/json.2.svg
+
+This is the image from json.2.bnf.
+
+See the previous point for how this file is created.
+
+=item o share/json.3.bnf
+
+It also is part of L<MarpaX::Demo::JSONParser>, and is written by Jeffrey Kegler.
+
+=item o share/json.3.log
+
+This is the log produced by running the code at log level C<debug>:
+
+	shell> scripts/bnf2graph.sh json.3 -max debug > share/json.3.log
+
+=item o html/json.3.svg
+
+This is the image from json.3.bnf.
+
 =item o share/metag.bnf.
 
-This is a copy of L<Marpa::R2>'s SLIF-DSL, as of Marpa::R2 V 2.068000.
+This is a copy of L<Marpa::R2>'s BNF, as of Marpa::R2 V 2.096000.
 
 See L</marpa_bnf_file([$bnf_file_name])> above.
 
 =item o share/stringparser.bnf.
 
-This is a copy of L<MarpaX::Demo::StringParser>'s SLIF-DSL.
+This is a copy of L<MarpaX::Demo::StringParser>'s BNF.
 
 =item o html/stringparser.svg
 
@@ -1342,10 +1408,11 @@ Generates html/index.html.
 
 This calls generate.demo.pl for each grammar shipped with the module.
 
-Actually, it skips c.ast by default, since it takes 6 m 47 s to run that. But if you pass any command line
-parameter to the script, it includes c.ast.
+Actually, it skips c.ast by default, since it takes 6 m 47 s to run that. But if you pass any
+command line parameter to the script, it includes c.ast.
 
-Then it copies html/* to my web server's doc root (which is in Debian's default RAM disk) at /dev/shm/html.
+Then it copies html/* to my web server's doc root (which is in Debian's default RAM disk) at
+/dev/shm/html.
 
 =item o scripts/pod2html.sh
 
@@ -1363,7 +1430,8 @@ Firstly, the Perl module L<GraphViz2> escapes some characters. Currently, these 
 
 We let L<GraphViz2> handle these.
 
-Secondly, L<Graphviz|http://graphviz.org> itself treats some characters specially. Currently, these are:
+Secondly, L<Graphviz|http://graphviz.org> itself treats some characters specially. Currently, these
+are:
 
 	< > : "
 
@@ -1380,22 +1448,24 @@ We use this code to handle these:
 
 This is due to the author using both 'comma' and '<comma>' as tokens within the grammar.
 
-So far this module does not handle that.
+So far this module does not notice the two are the same.
 
-A similar thing can happen elsewhere, e.g. with named event statements, when the rhs name uses (say) '<xyz>'
+A similar thing can happen elsewhere, e.g. with named event statements, when the rhs name uses (say)
+'<xyz>'
 and the rule referred to uses just 'xyz'.
 
 In all such cases, there will be 2 nodes, with 2 names differing in just the brackets.
 
 =head2 Why do some nodes have (or lack) a quantifier when I use it both with and without one?
 
-There is simply no way to plot a node both with and without the quantifier. The one which appears is chosen
-arbitrarily, depending on how the code scans the grammar. This means it is currently beyond control.
+There is simply no way to plot a node both with and without the quantifier. The one which appears is
+chosen arbitrarily, depending on how the code scans the grammar. This means it is currently beyond
+control.
 
 =head2 Why do the nodes on the demo page lack rule numbers?
 
-I'm undecided as to whether or not they are a good idea. I documented it on the demo page to indicate
-it was easy (for some nodes), and await feedback.
+I'm undecided as to whether or not they are a good idea. I documented it on the demo page to
+indicate it was easy (for some nodes), and await feedback.
 
 =head2 Can I control the format or placement of the legend?
 
@@ -1407,7 +1477,8 @@ No, but you can turn it off with the C<legend> option to C<< new() >>.
 
 =item o Perhaps add rule # to each node
 
-This is the rule # within the input stream. Doing this is simple for some nodes, and difficult for others.
+This is the rule # within the input stream. Doing this is simple for some nodes, and difficult for
+others.
 
 =back
 
@@ -1418,6 +1489,10 @@ The file Changes was converted into Changelog.ini by L<Module::Metadata::Changes
 =head1 Version Numbers
 
 Version numbers < 1.00 represent development versions. From 1.00 up, they are production versions.
+
+=head1 Repository
+
+L<https://github.com/ronsavage/MarpaX-Grammar-GraphViz2>
 
 =head1 Support
 
